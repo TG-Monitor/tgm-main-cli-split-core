@@ -2,41 +2,38 @@ plugins {
     id 'java'
 }
 
-apply plugin: 'application'
-mainClassName = 'ai.quantumsense.tgmonitor.main.Main'
-
 group 'ai.quantumsense.tgmonitor'
 version '0.0.1'
 
 sourceCompatibility = 1.8
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-}
+apply plugin: 'application'
+mainClassName = 'ai.quantumsense.tgmonitor.main.cli.split.MainCore'
 
 allprojects {
     repositories {
+        mavenCentral()
+
         maven { url "https://jitpack.io" }
     }
 }
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'org.slf4j:slf4j-simple:1.8.0-beta2'
+    implementation 'com.github.tg-monitor:tgm-ipc:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:tgm-corefacade:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:tgm-backend:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:tgm-monitor:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:tgm-telegram:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:tgm-notification:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:tgm-matching:0.0.4'
+    implementation 'com.github.tg-monitor:tgm-servicelocator-instances:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:tgm-entities:0.0.2'
+    implementation 'com.github.tg-monitor:tgm-logincodeprompt:0.0.1'
+    implementation 'com.github.tg-monitor:tgm-servicelocator:0.0.1'
 }
 
-dependencies {
-    implementation 'com.github.tg-monitor:tgm-ipc:master-SNAPSHOT'
-    implementation 'com.github.tg-monitor:tgm-monitor-facade:0.0.1'
-    implementation 'com.github.tg-monitor:tgm-backend:0.0.4'
-    implementation 'com.github.tg-monitor:tgm-monitor:0.0.4'
-    implementation 'com.github.tg-monitor:tgm-telegram:0.0.4'
-    implementation 'com.github.tg-monitor:tgm-notification:0.0.5'
-    implementation 'com.github.tg-monitor:tgm-matching:0.0.4'
-    implementation 'com.github.tg-monitor:tgm-servicelocator-instances:0.0.4'
-    implementation 'com.github.tg-monitor:tgm-entities:0.0.2'
-    implementation 'com.github.tg-monitor:tgm-servicelocator:0.0.1'
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
