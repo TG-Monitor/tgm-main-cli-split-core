@@ -41,6 +41,7 @@ public class MainCore {
     public static void main(String[] args) {
         checkEnv();
 
+        logger.debug("Creating service locators");
         ServiceLocator<Peers> peersLocator = new PeersLocator();
         ServiceLocator<Patterns> patternsLocator = new PatternsLocator();
         ServiceLocator<Emails> emailsLocator = new EmailsLocator();
@@ -58,8 +59,9 @@ public class MainCore {
                 new NotificatorImpl(new FormatterImpl(), new MailgunSender(MAILGUN_API_KEY, MAILGUN_DOMAIN, MAILGUN_SENDING_ADDRESS), emailsLocator),
                 interactorLocator);
 
+        logger.debug("Creating Core Endpoint");
         // Creates listener thread that keeps the core process alive indefinitely
-        new CoreEndpoint(new RabbitMqCoreMessenger(new JsonSerializer()),
+        CoreEndpoint coreEndpoint = new CoreEndpoint(new RabbitMqCoreMessenger(new JsonSerializer()),
                 new CoreFacadeImpl(monitorLocator, peersLocator, patternsLocator, emailsLocator));
     }
 
