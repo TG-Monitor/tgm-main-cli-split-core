@@ -8,7 +8,7 @@ version '0.0.1'
 sourceCompatibility = 1.8
 
 apply plugin: 'application'
-mainClassName = 'ai.quantumsense.tgmonitor.main.cli.split.MainCore'
+mainClassName = 'ai.quantumsense.tgmonitor.main.core.Main'
 
 allprojects {
     repositories {

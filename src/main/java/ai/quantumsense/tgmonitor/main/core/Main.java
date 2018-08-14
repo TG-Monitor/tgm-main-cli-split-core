@@ -1,7 +1,8 @@
-package ai.quantumsense.tgmonitor.main.cli.split;
+package ai.quantumsense.tgmonitor.main.core;
 
 import ai.quantumsense.tgmonitor.backend.Interactor;
 import ai.quantumsense.tgmonitor.backend.InteractorImpl;
+import ai.quantumsense.tgmonitor.corefacade.CoreFacade;
 import ai.quantumsense.tgmonitor.corefacade.CoreFacadeImpl;
 import ai.quantumsense.tgmonitor.entities.Emails;
 import ai.quantumsense.tgmonitor.entities.EmailsImpl;
@@ -26,9 +27,15 @@ import ai.quantumsense.tgmonitor.telegram.TelegramImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MainCore {
+import java.io.File;
 
-    private static Logger logger = LoggerFactory.getLogger(MainCore.class);
+public class Main {
+
+    private static Logger logger;
+    static {
+        createLogDir();
+        logger = LoggerFactory.getLogger(Main.class);
+    }
 
     private static final String TG_API_ID = System.getenv("TG_API_ID");
     private static final String TG_API_HASH = System.getenv("TG_API_HASH");
@@ -40,6 +47,7 @@ public class MainCore {
 
     public static void main(String[] args) {
         checkEnv();
+        createLogDir();
 
         logger.debug("Creating service locators");
         ServiceLocator<Peers> peersLocator = new PeersLocator();
@@ -59,8 +67,8 @@ public class MainCore {
                 new NotificatorImpl(new FormatterImpl(), new MailgunSender(MAILGUN_API_KEY, MAILGUN_DOMAIN, MAILGUN_SENDING_ADDRESS), emailsLocator),
                 interactorLocator);
 
-        RequestHandler requestHandler = new RequestHandler(AMQP_URI,
-                new CoreFacadeImpl(monitorLocator, peersLocator, patternsLocator, emailsLocator));
+        CoreFacade coreFacade = new CoreFacadeImpl(monitorLocator, peersLocator, patternsLocator, emailsLocator);
+        RequestHandler requestHandler = new RequestHandler(AMQP_URI, coreFacade);
     }
 
     private static void checkEnv() {
@@ -73,5 +81,9 @@ public class MainCore {
         else if (AMQP_URI == null) missing = "AMQP_URI";
         if (missing != null)
             throw new RuntimeException("Must set " + missing + " environment variable");
+    }
+
+    private static void createLogDir() {
+        new File("/var/log/tg-monitor").mkdirs();
     }
 }
