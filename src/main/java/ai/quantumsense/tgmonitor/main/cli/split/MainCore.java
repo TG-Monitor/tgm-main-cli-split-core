@@ -9,9 +9,7 @@ import ai.quantumsense.tgmonitor.entities.Patterns;
 import ai.quantumsense.tgmonitor.entities.PatternsImpl;
 import ai.quantumsense.tgmonitor.entities.Peers;
 import ai.quantumsense.tgmonitor.entities.PeersImpl;
-import ai.quantumsense.tgmonitor.ipc.CoreEndpoint;
-import ai.quantumsense.tgmonitor.ipc.messenger.RabbitMqCoreMessenger;
-import ai.quantumsense.tgmonitor.ipc.messenger.serializer.JsonSerializer;
+import ai.quantumsense.tgmonitor.ipc.core.RequestHandler;
 import ai.quantumsense.tgmonitor.matching.PatternMatcherImpl;
 import ai.quantumsense.tgmonitor.monitor.Monitor;
 import ai.quantumsense.tgmonitor.monitor.MonitorImpl;
@@ -37,6 +35,8 @@ public class MainCore {
     private static final String MAILGUN_API_KEY = System.getenv("MAILGUN_API_KEY");
     private static final String MAILGUN_DOMAIN = System.getenv("MAILGUN_DOMAIN");
     private static final String MAILGUN_SENDING_ADDRESS = System.getenv("MAILGUN_SENDING_ADDRESS");
+    private static final String AMQP_URI = System.getenv("AMQP_URI");
+
 
     public static void main(String[] args) {
         checkEnv();
@@ -59,9 +59,7 @@ public class MainCore {
                 new NotificatorImpl(new FormatterImpl(), new MailgunSender(MAILGUN_API_KEY, MAILGUN_DOMAIN, MAILGUN_SENDING_ADDRESS), emailsLocator),
                 interactorLocator);
 
-        logger.debug("Creating Core Endpoint");
-        // Creates listener thread that keeps the core process alive indefinitely
-        CoreEndpoint coreEndpoint = new CoreEndpoint(new RabbitMqCoreMessenger(new JsonSerializer()),
+        RequestHandler requestHandler = new RequestHandler(AMQP_URI,
                 new CoreFacadeImpl(monitorLocator, peersLocator, patternsLocator, emailsLocator));
     }
 
@@ -72,6 +70,7 @@ public class MainCore {
         else if (MAILGUN_API_KEY == null) missing = "MAILGUN_API_KEY";
         else if (MAILGUN_DOMAIN == null) missing = "MAILGUN_DOMAIN";
         else if (MAILGUN_SENDING_ADDRESS == null) missing = "MAILGUN_SENDING_ADDRESS";
+        else if (AMQP_URI == null) missing = "AMQP_URI";
         if (missing != null)
             throw new RuntimeException("Must set " + missing + " environment variable");
     }
