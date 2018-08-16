@@ -27,15 +27,9 @@ import ai.quantumsense.tgmonitor.telegram.TelegramImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-
 public class Main {
 
-    private static Logger logger;
-    static {
-        createLogDir();
-        logger = LoggerFactory.getLogger(Main.class);
-    }
+    private static Logger logger = LoggerFactory.getLogger(Main.class);
 
     private static final String TG_API_ID = System.getenv("TG_API_ID");
     private static final String TG_API_HASH = System.getenv("TG_API_HASH");
@@ -47,7 +41,6 @@ public class Main {
 
     public static void main(String[] args) {
         checkEnv();
-        createLogDir();
 
         logger.debug("Creating service locators");
         ServiceLocator<Peers> peersLocator = new PeersLocator();
@@ -81,9 +74,5 @@ public class Main {
         else if (AMQP_URI == null) missing = "AMQP_URI";
         if (missing != null)
             throw new RuntimeException("Must set " + missing + " environment variable");
-    }
-
-    private static void createLogDir() {
-        new File("/var/log/tg-monitor").mkdirs();
     }
 }
